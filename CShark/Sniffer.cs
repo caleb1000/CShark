@@ -1,5 +1,6 @@
 ﻿using CShark;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -38,8 +39,8 @@ class Sniffer
 
         if (SelectedInterface == string.Empty)
         {
-            IPAddress selectedIp = IPAddress.Parse("192.168.1.6");
-            rawSocket.Bind(new IPEndPoint(selectedIp, 0));
+            Debug.WriteLine("Network Interface not selected, Run failed");
+            return;
         }
         else
         {
@@ -48,8 +49,9 @@ class Sniffer
             {
                 rawSocket.Bind(new IPEndPoint(selectedIp, 0));
             }
-            catch 
+            catch
             {
+                Debug.WriteLine("Network Interface " + SelectedInterface + " failed to bind");
                 return;
             }
         }
@@ -70,11 +72,11 @@ class Sniffer
          * Start receiving packets asynchronously
          */
         byte[] buffer = new byte[4096];
-        
+
         rawSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, OnReceive, buffer);
 
-       
-        
+
+
         //rawSocket.Close();
 
     }
@@ -95,7 +97,7 @@ class Sniffer
         {
             if (adapter.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || adapter.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
             {
-               
+
                 foreach (UnicastIPAddressInformation ip in adapter.GetIPProperties().UnicastAddresses)
                 {
                     if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
@@ -124,7 +126,8 @@ class Sniffer
             {
                 protocolString = "TCP";
             }
-            else if (protocol == 17){
+            else if (protocol == 17)
+            {
                 protocolString = "UDP";
             }
             else
@@ -158,14 +161,14 @@ class Sniffer
             packet.DstIpAddress = dstString;
             packet.Time = DateTime.Now;
             packet.index = Index;
-            
+
             if (filter != null && filter.ContainedInFilter(srcString, dstString, (int)protocol))
             {
                 Index++;
                 recorder.Record(srcString, dstString, (int)protocol);
                 Packets.Add(packet);
             }
-          
+
             return (int)protocol;
         }
         return -1;
