@@ -13,6 +13,8 @@ namespace CShark
         string CurNetworkInterface;
         int index = 0;
         bool running = false;
+        bool autoSize = true;
+        bool colorRows = true;
         public CShark()
         {
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -50,6 +52,7 @@ namespace CShark
             int horizontalPosition = dataGridView1.FirstDisplayedScrollingColumnIndex;
             if (sniffer.Packets.Count > 0)
             {
+                //dataGridView1.RowHeadersVisible = false;
                 int scrollPosition = dataGridView1.FirstDisplayedScrollingRowIndex;
                 int preSize = packets.Count;
                 var orderedPackets = sniffer.Packets.OrderBy(p => p.index);
@@ -77,7 +80,7 @@ namespace CShark
             {
                 dataGridView1.FirstDisplayedScrollingRowIndex = 0;
             }
-
+            //dataGridView1.RowHeadersVisible = true;
             dataGridView1.FirstDisplayedScrollingColumnIndex = horizontalPosition;
 
         }
@@ -320,6 +323,33 @@ namespace CShark
         private void label6_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            autoSize = !autoSize;
+            if (autoSize)
+            {
+                dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            }
+            else
+            {
+                dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            }
+
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            colorRows = !colorRows;
+            if (colorRows)
+            {
+                dataGridView1.CellFormatting += dataGridView1_CellFormatting;
+            }
+            else
+            {
+                dataGridView1.CellFormatting -= dataGridView1_CellFormatting;
+            }
         }
     }
 }

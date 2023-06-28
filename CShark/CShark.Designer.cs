@@ -49,6 +49,8 @@
             richTextBox7 = new RichTextBox();
             label6 = new Label();
             label7 = new Label();
+            checkBox1 = new CheckBox();
+            checkBox2 = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -173,7 +175,7 @@
             // pictureBox1
             // 
             pictureBox1.BackgroundImage = (Image)resources.GetObject("pictureBox1.BackgroundImage");
-            pictureBox1.Location = new Point(1778, 51);
+            pictureBox1.Location = new Point(1795, 51);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(87, 84);
             pictureBox1.TabIndex = 12;
@@ -183,7 +185,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.BackColor = SystemColors.Control;
+            label5.BackColor = Color.AliceBlue;
             label5.Font = new Font("Stencil", 26.25F, FontStyle.Italic, GraphicsUnit.Point);
             label5.ForeColor = Color.SteelBlue;
             label5.Location = new Point(1725, 6);
@@ -267,11 +269,44 @@
             label7.TabIndex = 21;
             label7.Text = "Capture Count";
             // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.BackColor = Color.AliceBlue;
+            checkBox1.Checked = true;
+            checkBox1.CheckState = CheckState.Checked;
+            checkBox1.FlatStyle = FlatStyle.Flat;
+            checkBox1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            checkBox1.Location = new Point(1665, 116);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(109, 19);
+            checkBox1.TabIndex = 22;
+            checkBox1.Text = "Auto Size Rows";
+            checkBox1.UseVisualStyleBackColor = false;
+            checkBox1.CheckedChanged += checkBox1_CheckedChanged;
+            // 
+            // checkBox2
+            // 
+            checkBox2.AutoSize = true;
+            checkBox2.BackColor = Color.AliceBlue;
+            checkBox2.Checked = true;
+            checkBox2.CheckState = CheckState.Checked;
+            checkBox2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            checkBox2.Location = new Point(1664, 86);
+            checkBox2.Name = "checkBox2";
+            checkBox2.Size = new Size(88, 19);
+            checkBox2.TabIndex = 23;
+            checkBox2.Text = "Color Rows";
+            checkBox2.UseVisualStyleBackColor = false;
+            checkBox2.CheckedChanged += checkBox2_CheckedChanged;
+            // 
             // CShark
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1904, 1041);
+            Controls.Add(checkBox2);
+            Controls.Add(checkBox1);
             Controls.Add(label7);
             Controls.Add(label6);
             Controls.Add(richTextBox7);
@@ -325,5 +360,7 @@
         private RichTextBox richTextBox7;
         private Label label6;
         private Label label7;
+        private CheckBox checkBox1;
+        private CheckBox checkBox2;
     }
 }
