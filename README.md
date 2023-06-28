@@ -9,6 +9,6 @@
 * Optimize code (currently if too many packets come in user input is sluggish/non-responsive)
 * Clean up code
 * Save traffic in PCAP format
-* Support packet injection (will need to use 3rd party lib as raw sockets cannot send data on windows)
+* Support packet injection (will need to use 3rd party lib as raw sockets cannot send tcp packets on windows :( )
 ![image](https://github.com/caleb1000/CShark/assets/30327564/2ea313e4-f76e-4b3c-bd67-eae037077ab3)
 
