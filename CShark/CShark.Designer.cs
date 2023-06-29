@@ -59,6 +59,8 @@
             checkBox9 = new CheckBox();
             checkBox10 = new CheckBox();
             button4 = new Button();
+            richTextBox6 = new RichTextBox();
+            label9 = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -200,7 +202,7 @@
             richTextBox7.Location = new Point(513, 22);
             richTextBox7.Name = "richTextBox7";
             richTextBox7.ReadOnly = true;
-            richTextBox7.Size = new Size(234, 154);
+            richTextBox7.Size = new Size(234, 159);
             richTextBox7.TabIndex = 19;
             richTextBox7.Text = "";
             // 
@@ -281,7 +283,7 @@
             richTextBox5.BackColor = Color.AliceBlue;
             richTextBox5.Location = new Point(300, 22);
             richTextBox5.Name = "richTextBox5";
-            richTextBox5.Size = new Size(207, 154);
+            richTextBox5.Size = new Size(207, 66);
             richTextBox5.TabIndex = 26;
             richTextBox5.Text = "";
             // 
@@ -417,12 +419,33 @@
             button4.UseVisualStyleBackColor = true;
             button4.Click += button4_Click;
             // 
+            // richTextBox6
+            // 
+            richTextBox6.BackColor = Color.AliceBlue;
+            richTextBox6.Location = new Point(300, 108);
+            richTextBox6.Name = "richTextBox6";
+            richTextBox6.Size = new Size(207, 73);
+            richTextBox6.TabIndex = 37;
+            richTextBox6.Text = "";
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new Point(300, 93);
+            label9.Name = "label9";
+            label9.Size = new Size(82, 15);
+            label9.TabIndex = 38;
+            label9.Text = "Current Filter";
+            label9.Click += label9_Click;
+            // 
             // CShark
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
             ClientSize = new Size(1904, 1041);
+            Controls.Add(label9);
+            Controls.Add(richTextBox6);
             Controls.Add(button4);
             Controls.Add(checkBox10);
             Controls.Add(checkBox9);
@@ -496,5 +519,7 @@
         private CheckBox checkBox9;
         private CheckBox checkBox10;
         private Button button4;
+        private RichTextBox richTextBox6;
+        private Label label9;
     }
 }

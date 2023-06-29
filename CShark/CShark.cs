@@ -219,9 +219,10 @@ namespace CShark
             this.button2.Enabled = false;
             this.comboBox1.Enabled = true;
             this.button3.Enabled = true;
-            if (this.packets.Count > 0) { 
+            if (this.packets.Count > 0)
+            {
                 this.button4.Enabled = true;
-            }    
+            }
             this.button1.Enabled = true;
             this.curPacketCount = 0;
             this.sniffer.CloseSocket();
@@ -285,20 +286,20 @@ namespace CShark
         private void button3_Click(object sender, EventArgs e)
         {
             this.filter = new();
-
+            this.richTextBox6.Text = "";
             /*
              * Parse Source IP Address Filters
              */
             string cleanSrc = this.richTextBox2.Text.Replace("\n", "").Replace(" ", "");
             string[] srcs = cleanSrc.Split(',');
-            this.richTextBox5.Text += "Filter Settings: \n";
+            this.richTextBox6.Text += "Filter Settings: \n";
             foreach (var src in srcs)
             {
                 int periodCount = src.Count(x => x == '.');
                 IPAddress? temp;
                 if (IPAddress.TryParse(src, out temp) && periodCount == 3)
                 {
-                    this.richTextBox5.Text += "    Source IP: " + src + "\n";
+                    this.richTextBox6.Text += "    Source IP: " + src + "\n";
                     this.filter.SourceIPAddresses.Add(src);
                 }
             }
@@ -314,7 +315,7 @@ namespace CShark
                 IPAddress? temp;
                 if (IPAddress.TryParse(dst, out temp) && periodCount == 3)
                 {
-                    this.richTextBox5.Text += "    Destination IP: " + dst + "\n";
+                    this.richTextBox6.Text += "    Destination IP: " + dst + "\n";
                     this.filter.DestinationIPAddresses.Add(dst);
                 }
             }
@@ -333,27 +334,27 @@ namespace CShark
                     {
                         case "TCP":
                             this.filter.Protocols.Add(6);
-                            this.richTextBox5.Text += "    Protocol: TCP\n";
+                            this.richTextBox6.Text += "    Protocol: TCP\n";
                             break;
                         case "tcp":
                             this.filter.Protocols.Add(6);
-                            this.richTextBox5.Text += "    Protocol: TCP\n";
+                            this.richTextBox6.Text += "    Protocol: TCP\n";
                             break;
                         case "UDP":
                             this.filter.Protocols.Add(17);
-                            this.richTextBox5.Text += "    Protocol: UDP\n";
+                            this.richTextBox6.Text += "    Protocol: UDP\n";
                             break;
                         case "udp":
                             this.filter.Protocols.Add(17);
-                            this.richTextBox5.Text += "    Protocol: UDP\n";
+                            this.richTextBox6.Text += "    Protocol: UDP\n";
                             break;
                         case "IGMP":
                             this.filter.Protocols.Add(2);
-                            this.richTextBox5.Text += "    Protocol: IGMP\n";
+                            this.richTextBox6.Text += "    Protocol: IGMP\n";
                             break;
                         case "igmp":
                             this.filter.Protocols.Add(2);
-                            this.richTextBox5.Text += "    Protocol: IGMP\n";
+                            this.richTextBox6.Text += "    Protocol: IGMP\n";
                             break;
                         default:
                             /*
@@ -363,12 +364,12 @@ namespace CShark
                             bool isInt = Int32.TryParse(pro, out proInt);
                             if (isInt && proInt >= 0 && proInt <= 255)
                             {
-                                this.richTextBox5.Text += "    Protocol: " + pro + "\n";
+                                this.richTextBox6.Text += "    Protocol: " + pro + "\n";
                                 this.filter.Protocols.Add(proInt);
                             }
                             else
                             {
-                                this.richTextBox5.Text += "    Invalid Protocol: " + pro + "\n";
+                                this.richTextBox6.Text += "    Invalid Protocol: " + pro + "\n";
                             }
                             break;
                     }
@@ -599,6 +600,11 @@ namespace CShark
                 this.dataGridView1.DataSource = this.packetsFiltered;
                 return;
             }
+        }
+
+        private void label9_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
