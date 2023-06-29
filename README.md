@@ -10,7 +10,7 @@
 * Clean up code
 * Save traffic in PCAP format
 * Support packet injection (will need to use 3rd party lib as raw sockets cannot send tcp packets on windows)
-* Add network statistics (such as useing scott-plot)
+* Add network statistics monitoring
 * Add names to network interfaces
 
   
