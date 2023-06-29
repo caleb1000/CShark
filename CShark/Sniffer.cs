@@ -24,6 +24,7 @@ class Sniffer
     public Filter filter = new();
     public Recorder recorder = new();
     public List<string> ipAddresses = new();
+    public List<string> interfaceNames = new();
     public string SelectedInterface = string.Empty;
     UInt64 Index = 0;
     public ConcurrentBag<Packet> Packets = new();
@@ -120,6 +121,7 @@ class Sniffer
                     if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                     {
                         ipAddresses.Add(ip.Address.ToString());
+                        interfaceNames.Add(adapter.Name);
                         index++;
                     }
                 }
@@ -139,6 +141,7 @@ class Sniffer
 
             byte protocol = buffer[Ipv4ProtocolOffset];
             string protocolString;
+            //TO:DO - Switch to case statement and more protocols
             if (protocol == 6)
             {
                 protocolString = "TCP";
@@ -146,6 +149,10 @@ class Sniffer
             else if (protocol == 17)
             {
                 protocolString = "UDP";
+            }
+            else if (protocol == 2)
+            {
+                protocolString = "IGMP"; 
             }
             else
             {

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Net;
 using System.Reflection;
 
 namespace CShark
@@ -41,14 +42,19 @@ namespace CShark
             InitializeComponent();
 
             sniffer.NetworkInterfaces();
-            foreach (string s in sniffer.ipAddresses)
+            foreach (string s in sniffer.interfaceNames)
             {
                 comboBox1.Items.Add(s);
+
+            }
+            foreach (string s in sniffer.ipAddresses)
+            {
                 NetworkInterfaces.Add(s);
             }
             comboBox1.SelectedIndex = 1;
             CurNetworkInterface = this.NetworkInterfaces.ElementAt(1);
             button1.Text = "Scan IP: " + CurNetworkInterface;
+            button2.Enabled = false;
 
         }
 
@@ -200,9 +206,13 @@ namespace CShark
                 {
                     dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Aqua;
                 }
-                else
+                else if (packet != null && packet.Protocol == "IGMP")
                 {
                     dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Yellow;
+                }
+                else
+                {
+                    dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Orange;
                 }
             }
 
@@ -254,8 +264,9 @@ namespace CShark
                 richTextBox5.Text += "Filter Settings: \n";
                 foreach (var src in srcs)
                 {
-
-                    if (src != string.Empty)
+                    int periodCount = src.Count(x => x == '.');
+                    IPAddress? temp;
+                    if (IPAddress.TryParse(src, out temp) && periodCount == 3)
                     {
                         richTextBox5.Text += "    Source IP: " + src + "\n";
                         filter.SourceIPAddresses.Add(src);
@@ -268,10 +279,12 @@ namespace CShark
 
                 foreach (var dst in dsts)
                 {
-
-                    if (dst != string.Empty)
+                    int periodCount = dst.Count(x => x == '.');
+                    IPAddress? temp;
+                    if (IPAddress.TryParse(dst, out temp) && periodCount == 3)
                     {
                         richTextBox5.Text += "    Destination IP: " + dst + "\n";
+
                         filter.DestinationIPAddresses.Add(dst);
                     }
                 }
