@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Text;
 
 class Sniffer
 {
@@ -31,6 +32,24 @@ class Sniffer
     {
         this.filter = filter;
     }
+
+    static string HexStringToAscii(string hexString)
+    {
+        hexString = hexString.Replace("-", "");
+        if (hexString.Length % 2 != 0)
+        {
+            throw new ArgumentException("Invalid hex string length.");
+        }
+
+        byte[] bytes = new byte[hexString.Length / 2];
+        for (int i = 0; i < hexString.Length; i += 2)
+        {
+            bytes[i / 2] = Convert.ToByte(hexString.Substring(i, 2), 16);
+        }
+
+        return Encoding.ASCII.GetString(bytes);
+    }
+
 
     public int Run()
     {
@@ -159,6 +178,7 @@ class Sniffer
             packet.DstIpAddress = dstString;
             packet.Time = DateTime.Now;
             packet.index = Index;
+            packet.Ascii = HexStringToAscii(transportPacketHex);
 
             if (filter != null && filter.ContainedInFilter(srcString, dstString, (int)protocol))
             {

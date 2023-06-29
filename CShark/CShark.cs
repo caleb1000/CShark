@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Net;
-using System.Windows.Forms;
+using System.Reflection;
 
 namespace CShark
 {
@@ -11,13 +10,27 @@ namespace CShark
         Sniffer? sniffer = new();
         Filter filter = new();
         BindingList<Packet> packets = new();
+        //packetStack will be a buffer to allow only a small amount of data be displayed
         string CurNetworkInterface;
         List<string> NetworkInterfaces = new List<string>();
+
         int index = 0;
         bool running = false;
+
+        /*
+         * Checkbox Bools
+         */
         bool autoSize = true;
         bool colorRows = true;
-        int lineIndex = 0;
+        bool transportVisible = true;
+        bool ipVisible = true;
+        bool protocolVisible = true;
+        bool asciiVisible = true;
+        bool timeVisible = true;
+        bool srcVisible = true;
+        bool dstVisible = true;
+
+
 
         public CShark()
         {
@@ -55,7 +68,6 @@ namespace CShark
 
         private void MyTimer_Tick(object sender, EventArgs e)
         {
-            int horizontalPosition = dataGridView1.FirstDisplayedScrollingColumnIndex;
             if (sniffer.Packets.Count > 0)
             {
                 int scrollPosition = dataGridView1.FirstDisplayedScrollingRowIndex;
@@ -63,6 +75,7 @@ namespace CShark
                 var orderedPackets = sniffer.Packets.OrderBy(p => p.index);
                 int postSize = orderedPackets.Count();
                 //TO:DO - make a better way of adding packets to bindinglist, maybe have a buffer of sorts
+
                 for (int i = preSize; i < postSize; i++)
                 {
                     index++;
@@ -85,13 +98,14 @@ namespace CShark
             {
                 dataGridView1.FirstDisplayedScrollingRowIndex = 0;
             }
-            dataGridView1.FirstDisplayedScrollingColumnIndex = horizontalPosition;
-
         }
 
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic |
+            BindingFlags.Instance | BindingFlags.SetProperty, null,
+            dataGridView1, new object[] { true });
             dataGridView1.CellFormatting += dataGridView1_CellFormatting;
             dataGridView1.ScrollBars = ScrollBars.Both;
             dataGridView1.ReadOnly = true;
@@ -131,7 +145,6 @@ namespace CShark
                 {
                     richTextBox5.Text += "Info: Successfully binded to Network Interface " + CurNetworkInterface + " \n";
                 }
-                lineIndex++;
                 MyTimer.Interval = (100); // .1 seconds, could be changed and is somewhat randomly picked
                 MyTimer.Tick += new EventHandler(MyTimer_Tick);
                 MyTimer.Start();
@@ -372,6 +385,105 @@ namespace CShark
         private void richTextBox5_TextChanged_1(object sender, EventArgs e)
         {
             //rename this to debug
+        }
+
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+
+            if (transportVisible)
+            {
+                this.dataGridView1.Columns["TransportHeader"].Visible = false;
+            }
+            else
+            {
+                this.dataGridView1.Columns["TransportHeader"].Visible = true;
+            }
+
+            transportVisible = !transportVisible;
+        }
+
+        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ipVisible)
+            {
+                this.dataGridView1.Columns["IpHeader"].Visible = false;
+            }
+            else
+            {
+                this.dataGridView1.Columns["IpHeader"].Visible = true;
+            }
+
+            ipVisible = !ipVisible;
+        }
+
+        private void checkBox6_CheckedChanged(object sender, EventArgs e)
+        {
+            if (asciiVisible)
+            {
+                this.dataGridView1.Columns["Ascii"].Visible = false;
+            }
+            else
+            {
+                this.dataGridView1.Columns["Ascii"].Visible = true;
+            }
+
+            asciiVisible = !asciiVisible;
+        }
+
+        private void checkBox7_CheckedChanged(object sender, EventArgs e)
+        {
+            if (srcVisible)
+            {
+                this.dataGridView1.Columns["SrcIpAddress"].Visible = false;
+            }
+            else
+            {
+                this.dataGridView1.Columns["SrcIpAddress"].Visible = true;
+            }
+
+            srcVisible = !srcVisible;
+        }
+
+        private void checkBox8_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dstVisible)
+            {
+                this.dataGridView1.Columns["DstIpAddress"].Visible = false;
+            }
+            else
+            {
+                this.dataGridView1.Columns["DstIpAddress"].Visible = true;
+            }
+
+            dstVisible = !dstVisible;
+        }
+
+        private void checkBox9_CheckedChanged(object sender, EventArgs e)
+        {
+            if (protocolVisible)
+            {
+                this.dataGridView1.Columns["Protocol"].Visible = false;
+            }
+            else
+            {
+                this.dataGridView1.Columns["Protocol"].Visible = true;
+            }
+
+            protocolVisible = !protocolVisible;
+        }
+
+        private void checkBox10_CheckedChanged(object sender, EventArgs e)
+        {
+            if (timeVisible)
+            {
+                this.dataGridView1.Columns["Time"].Visible = false;
+            }
+            else
+            {
+                this.dataGridView1.Columns["Time"].Visible = true;
+            }
+
+            timeVisible = !timeVisible;
         }
     }
 }

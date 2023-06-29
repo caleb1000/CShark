@@ -11,5 +11,6 @@ namespace CShark
         public string Protocol { get; set; }
         public string IpHeader { get; set; }
         public string TransportHeader { get; set; }
+        public string Ascii { get; set; }
     }
 }
