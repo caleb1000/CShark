@@ -26,21 +26,20 @@ class Sniffer
     public string SelectedInterface = string.Empty;
     UInt64 Index = 0;
     public ConcurrentBag<Packet> Packets = new();
-    public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
     public void SetFilter(Filter filter)
     {
         this.filter = filter;
     }
 
-    public void Run()
+    public int Run()
     {
         rawSocket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
 
         if (SelectedInterface == string.Empty)
         {
             Debug.WriteLine("Network Interface not selected, Run failed");
-            return;
+            return -1;
         }
         else
         {
@@ -52,7 +51,7 @@ class Sniffer
             catch
             {
                 Debug.WriteLine("Network Interface " + SelectedInterface + " failed to bind");
-                return;
+                return -1;
             }
         }
 
@@ -76,13 +75,12 @@ class Sniffer
         rawSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, OnReceive, buffer);
 
 
-
+        return 0;
         //rawSocket.Close();
 
     }
     public void CloseSocket()
     {
-        cancellationTokenSource.Cancel();
         if (rawSocket != null)
         {
             rawSocket.Close();
@@ -176,11 +174,6 @@ class Sniffer
 
     private void OnReceive(IAsyncResult ar)
     {
-        if (this.cancellationTokenSource.IsCancellationRequested)
-        {
-            return;
-        }
-
         if (ar.AsyncState == null)
         {
             Console.WriteLine("Error, AysncState is null");

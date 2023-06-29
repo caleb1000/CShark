@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
+using System.Windows.Forms;
 
 namespace CShark
 {
@@ -11,10 +12,13 @@ namespace CShark
         Filter filter = new();
         BindingList<Packet> packets = new();
         string CurNetworkInterface;
+        List<string> NetworkInterfaces = new List<string>();
         int index = 0;
         bool running = false;
         bool autoSize = true;
         bool colorRows = true;
+        int lineIndex = 0;
+
         public CShark()
         {
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -22,15 +26,17 @@ namespace CShark
             Icon = Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             InitializeComponent();
+
             sniffer.NetworkInterfaces();
-            richTextBox5.Text += "Network Interfaces:\n";
-            richTextBox5.Text += "------------------------\n";
             foreach (string s in sniffer.ipAddresses)
             {
-                richTextBox5.Text += s + "\n";
+                comboBox1.Items.Add(s);
+                NetworkInterfaces.Add(s);
             }
-            CurNetworkInterface = this.sniffer.ipAddresses.ElementAt(1);
+            comboBox1.SelectedIndex = 1;
+            CurNetworkInterface = this.NetworkInterfaces.ElementAt(1);
             button1.Text = "Scan IP: " + CurNetworkInterface;
+
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -52,7 +58,6 @@ namespace CShark
             int horizontalPosition = dataGridView1.FirstDisplayedScrollingColumnIndex;
             if (sniffer.Packets.Count > 0)
             {
-                //dataGridView1.RowHeadersVisible = false;
                 int scrollPosition = dataGridView1.FirstDisplayedScrollingRowIndex;
                 int preSize = packets.Count;
                 var orderedPackets = sniffer.Packets.OrderBy(p => p.index);
@@ -80,7 +85,6 @@ namespace CShark
             {
                 dataGridView1.FirstDisplayedScrollingRowIndex = 0;
             }
-            //dataGridView1.RowHeadersVisible = true;
             dataGridView1.FirstDisplayedScrollingColumnIndex = horizontalPosition;
 
         }
@@ -104,8 +108,10 @@ namespace CShark
 
         private void button1_Click(object sender, EventArgs e)
         {
-            button4.Visible = false;
-            button3.Visible = false;
+            button2.Enabled = true;
+            comboBox1.Enabled = false;
+            button3.Enabled = false;
+            button1.Enabled = false;
             this.packets.Clear();
             dataGridView1.Refresh();
             richTextBox1.Text = "Packets Captured: 0";
@@ -115,7 +121,17 @@ namespace CShark
                 this.running = true;
                 this.sniffer.SetFilter(this.filter);
                 this.sniffer.SelectedInterface = CurNetworkInterface;
-                sniffer.Run();
+                int result = sniffer.Run();
+                if (result != 0)
+                {
+                    richTextBox5.Text += "Error: Failed to bind to Network Interface " + CurNetworkInterface + " \n";
+                    return;
+                }
+                else
+                {
+                    richTextBox5.Text += "Info: Successfully binded to Network Interface " + CurNetworkInterface + " \n";
+                }
+                lineIndex++;
                 MyTimer.Interval = (100); // .1 seconds, could be changed and is somewhat randomly picked
                 MyTimer.Tick += new EventHandler(MyTimer_Tick);
                 MyTimer.Start();
@@ -124,8 +140,10 @@ namespace CShark
 
         private void button2_Click(object sender, EventArgs e)
         {
-            button4.Visible = true;
-            button3.Visible = true;
+            button2.Enabled = false;
+            comboBox1.Enabled = true;
+            button3.Enabled = true;
+            button1.Enabled = true;
             if (this.running)
             {
                 index = 0;
@@ -149,7 +167,6 @@ namespace CShark
                     richTextBox7.Text += pro.ToString() + "\n";
                 }
                 sniffer = new();
-                filter = new();
                 this.running = false;
                 MyTimer.Stop();
             }
@@ -221,13 +238,13 @@ namespace CShark
                 filter = new();
                 string cleanSrc = richTextBox2.Text.Replace("\n", "").Replace(" ", "");
                 string[] srcs = cleanSrc.Split(',');
-
+                richTextBox5.Text += "Filter Settings: \n";
                 foreach (var src in srcs)
                 {
 
                     if (src != string.Empty)
                     {
-                        Debug.WriteLine("Source IP: " + src);
+                        richTextBox5.Text += "    Source IP: " + src + "\n";
                         filter.SourceIPAddresses.Add(src);
                     }
 
@@ -241,7 +258,7 @@ namespace CShark
 
                     if (dst != string.Empty)
                     {
-                        Debug.WriteLine("Destination IP: " + dst);
+                        richTextBox5.Text += "    Destination IP: " + dst + "\n";
                         filter.DestinationIPAddresses.Add(dst);
                     }
                 }
@@ -256,7 +273,7 @@ namespace CShark
                         int x = 0;
                         if (Int32.TryParse(pro, out x))
                         {
-                            Debug.WriteLine("Protocol: " + pro);
+                            richTextBox5.Text += "    Protocol: " + pro + "\n";
                             filter.Protocols.Add(x);
                         }
                     }
@@ -293,21 +310,6 @@ namespace CShark
         private void richTextBox6_TextChanged(object sender, EventArgs e)
         {
 
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            if (!running)
-            {
-                IPAddress? ipAddress;
-                string cleanText = richTextBox6.Text.Replace("\n", "").Replace(" ", "");
-                if (IPAddress.TryParse(cleanText, out ipAddress))
-                {
-                    button1.Text = "Scan IP: " + cleanText;
-                    this.sniffer.SelectedInterface = cleanText;
-                    CurNetworkInterface = cleanText;
-                }
-            }
         }
 
         private void label4_Click(object sender, EventArgs e)
@@ -350,6 +352,26 @@ namespace CShark
             {
                 dataGridView1.CellFormatting -= dataGridView1_CellFormatting;
             }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int selectedIndex = comboBox1.SelectedIndex;
+            if (selectedIndex >= 0)
+            {
+                CurNetworkInterface = NetworkInterfaces.ElementAt(selectedIndex);
+                button1.Text = "Scan IP: " + CurNetworkInterface;
+            }
+        }
+
+        private void label4_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void richTextBox5_TextChanged_1(object sender, EventArgs e)
+        {
+            //rename this to debug
         }
     }
 }

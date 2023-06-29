@@ -42,15 +42,15 @@
             button3 = new Button();
             pictureBox1 = new PictureBox();
             label5 = new Label();
-            richTextBox5 = new RichTextBox();
-            richTextBox6 = new RichTextBox();
-            button4 = new Button();
-            label4 = new Label();
             richTextBox7 = new RichTextBox();
             label6 = new Label();
             label7 = new Label();
             checkBox1 = new CheckBox();
             checkBox2 = new CheckBox();
+            comboBox1 = new ComboBox();
+            label4 = new Label();
+            richTextBox5 = new RichTextBox();
+            label8 = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -195,57 +195,13 @@
             label5.Text = "C#Shark";
             label5.Click += label5_Click;
             // 
-            // richTextBox5
-            // 
-            richTextBox5.BackColor = Color.AliceBlue;
-            richTextBox5.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            richTextBox5.Location = new Point(37, 78);
-            richTextBox5.Name = "richTextBox5";
-            richTextBox5.ReadOnly = true;
-            richTextBox5.Size = new Size(391, 81);
-            richTextBox5.TabIndex = 15;
-            richTextBox5.Text = "";
-            richTextBox5.TextChanged += richTextBox5_TextChanged;
-            // 
-            // richTextBox6
-            // 
-            richTextBox6.Location = new Point(37, 28);
-            richTextBox6.Name = "richTextBox6";
-            richTextBox6.Size = new Size(183, 44);
-            richTextBox6.TabIndex = 16;
-            richTextBox6.Text = "";
-            richTextBox6.TextChanged += richTextBox6_TextChanged;
-            // 
-            // button4
-            // 
-            button4.BackgroundImage = (Image)resources.GetObject("button4.BackgroundImage");
-            button4.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button4.ForeColor = SystemColors.ControlText;
-            button4.Location = new Point(237, 28);
-            button4.Name = "button4";
-            button4.Size = new Size(191, 44);
-            button4.TabIndex = 17;
-            button4.Text = "Set Network Interface";
-            button4.UseVisualStyleBackColor = true;
-            button4.Click += button4_Click;
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Location = new Point(37, 7);
-            label4.Name = "label4";
-            label4.Size = new Size(131, 15);
-            label4.TabIndex = 18;
-            label4.Text = "Enter Network Interface";
-            label4.Click += label4_Click;
-            // 
             // richTextBox7
             // 
             richTextBox7.BackColor = Color.AliceBlue;
-            richTextBox7.Location = new Point(450, 23);
+            richTextBox7.Location = new Point(465, 23);
             richTextBox7.Name = "richTextBox7";
             richTextBox7.ReadOnly = true;
-            richTextBox7.Size = new Size(249, 131);
+            richTextBox7.Size = new Size(234, 131);
             richTextBox7.TabIndex = 19;
             richTextBox7.Text = "";
             richTextBox7.TextChanged += richTextBox7_TextChanged;
@@ -253,11 +209,11 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(450, 5);
+            label6.Location = new Point(465, 7);
             label6.Name = "label6";
-            label6.Size = new Size(57, 15);
+            label6.Size = new Size(202, 15);
             label6.TabIndex = 20;
-            label6.Text = "Observed";
+            label6.Text = "Observed IP Addresses and Protocols";
             label6.Click += label6_Click;
             // 
             // label7
@@ -277,7 +233,7 @@
             checkBox1.CheckState = CheckState.Checked;
             checkBox1.FlatStyle = FlatStyle.Flat;
             checkBox1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            checkBox1.Location = new Point(1665, 116);
+            checkBox1.Location = new Point(12, 116);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(109, 19);
             checkBox1.TabIndex = 22;
@@ -291,29 +247,72 @@
             checkBox2.BackColor = Color.AliceBlue;
             checkBox2.Checked = true;
             checkBox2.CheckState = CheckState.Checked;
+            checkBox2.FlatStyle = FlatStyle.Flat;
             checkBox2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            checkBox2.Location = new Point(1664, 86);
+            checkBox2.Location = new Point(127, 116);
             checkBox2.Name = "checkBox2";
-            checkBox2.Size = new Size(88, 19);
+            checkBox2.Size = new Size(85, 19);
             checkBox2.TabIndex = 23;
             checkBox2.Text = "Color Rows";
             checkBox2.UseVisualStyleBackColor = false;
             checkBox2.CheckedChanged += checkBox2_CheckedChanged;
+            // 
+            // comboBox1
+            // 
+            comboBox1.BackColor = Color.AliceBlue;
+            comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox1.Font = new Font("Segoe UI Semilight", 18F, FontStyle.Regular, GraphicsUnit.Point);
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Location = new Point(12, 49);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(198, 40);
+            comboBox1.TabIndex = 24;
+            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label4.Location = new Point(12, 9);
+            label4.Name = "label4";
+            label4.Size = new Size(198, 21);
+            label4.TabIndex = 25;
+            label4.Text = "Select Network Interface";
+            label4.Click += label4_Click_1;
+            // 
+            // richTextBox5
+            // 
+            richTextBox5.BackColor = Color.AliceBlue;
+            richTextBox5.Location = new Point(235, 24);
+            richTextBox5.Name = "richTextBox5";
+            richTextBox5.Size = new Size(207, 130);
+            richTextBox5.TabIndex = 26;
+            richTextBox5.Text = "";
+            richTextBox5.TextChanged += richTextBox5_TextChanged_1;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(235, 6);
+            label8.Name = "label8";
+            label8.Size = new Size(88, 15);
+            label8.TabIndex = 27;
+            label8.Text = "Debug Console";
             // 
             // CShark
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1904, 1041);
+            Controls.Add(label8);
+            Controls.Add(richTextBox5);
+            Controls.Add(label4);
+            Controls.Add(comboBox1);
             Controls.Add(checkBox2);
             Controls.Add(checkBox1);
             Controls.Add(label7);
             Controls.Add(label6);
             Controls.Add(richTextBox7);
-            Controls.Add(label4);
-            Controls.Add(button4);
-            Controls.Add(richTextBox6);
-            Controls.Add(richTextBox5);
             Controls.Add(label5);
             Controls.Add(pictureBox1);
             Controls.Add(button3);
@@ -353,14 +352,14 @@
         private Button button3;
         private PictureBox pictureBox1;
         private Label label5;
-        private RichTextBox richTextBox5;
-        private RichTextBox richTextBox6;
-        private Button button4;
-        private Label label4;
         private RichTextBox richTextBox7;
         private Label label6;
         private Label label7;
         private CheckBox checkBox1;
         private CheckBox checkBox2;
+        private ComboBox comboBox1;
+        private Label label4;
+        private RichTextBox richTextBox5;
+        private Label label8;
     }
 }
