@@ -10,6 +10,8 @@
 * Clean up code
 * Save traffic in PCAP format
 * Support packet injection (will need to use 3rd party lib as raw sockets cannot send tcp packets on windows)
+* Add network statistics (such as useing scott-plot)
+* Add names to network interfaces
 
   
 ![image](https://github.com/caleb1000/CShark/assets/30327564/e4cbc703-bf0f-440b-a2d1-9eb944604597)
