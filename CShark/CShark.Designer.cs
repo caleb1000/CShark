@@ -72,7 +72,6 @@
             dataGridView1.RowTemplate.Height = 25;
             dataGridView1.Size = new Size(1856, 791);
             dataGridView1.TabIndex = 0;
-            dataGridView1.CellContentClick += dataGridView1_CellContentClick;
             // 
             // button1
             // 
@@ -82,7 +81,7 @@
             button1.Name = "button1";
             button1.Size = new Size(391, 44);
             button1.TabIndex = 1;
-            button1.Text = "Scan IP 192.168.1.6";
+            button1.Text = "Scan IP ";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
@@ -109,7 +108,6 @@
             richTextBox1.Size = new Size(182, 49);
             richTextBox1.TabIndex = 4;
             richTextBox1.Text = "";
-            richTextBox1.TextChanged += richTextBox1_TextChanged;
             // 
             // richTextBox2
             // 
@@ -118,7 +116,6 @@
             richTextBox2.Size = new Size(217, 44);
             richTextBox2.TabIndex = 5;
             richTextBox2.Text = "";
-            richTextBox2.TextChanged += richTextBox2_TextChanged;
             // 
             // richTextBox3
             // 
@@ -127,7 +124,6 @@
             richTextBox3.Size = new Size(217, 49);
             richTextBox3.TabIndex = 6;
             richTextBox3.Text = "";
-            richTextBox3.TextChanged += richTextBox3_TextChanged;
             // 
             // richTextBox4
             // 
@@ -136,7 +132,6 @@
             richTextBox4.Size = new Size(217, 44);
             richTextBox4.TabIndex = 7;
             richTextBox4.Text = "";
-            richTextBox4.TextChanged += richTextBox4_TextChanged;
             // 
             // label1
             // 
@@ -146,7 +141,6 @@
             label1.Size = new Size(86, 15);
             label1.TabIndex = 8;
             label1.Text = "Protocol Filter";
-            label1.Click += label1_Click;
             // 
             // label2
             // 
@@ -156,7 +150,6 @@
             label2.Size = new Size(92, 15);
             label2.TabIndex = 9;
             label2.Text = "Source IP Filter";
-            label2.Click += label2_Click;
             // 
             // label3
             // 
@@ -187,7 +180,7 @@
             pictureBox1.Size = new Size(87, 84);
             pictureBox1.TabIndex = 12;
             pictureBox1.TabStop = false;
-            pictureBox1.Click += pictureBox1_Click_2;
+
             // 
             // label5
             // 
@@ -200,7 +193,6 @@
             label5.Size = new Size(176, 42);
             label5.TabIndex = 14;
             label5.Text = "C#Shark";
-            label5.Click += label5_Click;
             // 
             // richTextBox7
             // 
@@ -211,7 +203,6 @@
             richTextBox7.Size = new Size(234, 154);
             richTextBox7.TabIndex = 19;
             richTextBox7.Text = "";
-            richTextBox7.TextChanged += richTextBox7_TextChanged;
             // 
             // label6
             // 
@@ -221,7 +212,6 @@
             label6.Size = new Size(212, 15);
             label6.TabIndex = 20;
             label6.Text = "Observed IP Addresses and Protocols";
-            label6.Click += label6_Click;
             // 
             // label7
             // 
@@ -285,7 +275,6 @@
             label4.Size = new Size(198, 21);
             label4.TabIndex = 25;
             label4.Text = "Select Network Interface";
-            label4.Click += label4_Click_1;
             // 
             // richTextBox5
             // 
@@ -295,7 +284,6 @@
             richTextBox5.Size = new Size(207, 154);
             richTextBox5.TabIndex = 26;
             richTextBox5.Text = "";
-            richTextBox5.TextChanged += richTextBox5_TextChanged_1;
             // 
             // label8
             // 
