@@ -63,6 +63,7 @@ class Sniffer
         }
         else
         {
+            //switch this to a try
             IPAddress selectedIp = IPAddress.Parse(SelectedInterface);
             try
             {

@@ -80,6 +80,11 @@ namespace CShark
                 //Add IP to list
                 this.NetworkInterfaces.Add(ip);
             }
+            if (!this.NetworkInterfaces.Contains("127.0.0.1"))
+            {
+                this.comboBox1.Items.Add("Localhost Loopback");
+                this.NetworkInterfaces.Add("127.0.0.1");
+            }
             this.comboBox1.SelectedIndex = 1;
             this.CurNetworkInterface = this.NetworkInterfaces.ElementAt(this.comboBox1.SelectedIndex);
             this.button1.Text = "Scan IP: " + this.CurNetworkInterface;
