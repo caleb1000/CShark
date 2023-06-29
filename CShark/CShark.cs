@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.IO.Packaging;
 using System.Net;
 using System.Reflection;
 
@@ -25,6 +26,11 @@ namespace CShark
         /// Binding list used to hold packets read from capture
         /// </summary>
         BindingList<Packet> packets = new();
+
+        /// <summary>
+        /// After a run this list is used to hold the filtered packets
+        /// </summary>
+        BindingList<Packet> packetsFiltered = new();
 
         /// <summary>
         /// Current Network Interface selected
@@ -89,6 +95,7 @@ namespace CShark
             this.CurNetworkInterface = this.NetworkInterfaces.ElementAt(this.comboBox1.SelectedIndex);
             this.button1.Text = "Scan IP: " + this.CurNetworkInterface;
             this.button2.Enabled = false;
+            this.button4.Enabled = false;
 
         }
 
@@ -178,6 +185,7 @@ namespace CShark
             this.button2.Enabled = true;
             this.comboBox1.Enabled = false;
             this.button3.Enabled = false;
+            this.button4.Enabled = false;
             this.button1.Enabled = false;
             this.packets.Clear();
             this.dataGridView1.Refresh();
@@ -185,6 +193,7 @@ namespace CShark
             this.richTextBox7.Text = string.Empty;
             this.sniffer.SetFilter(this.filter);
             this.sniffer.SelectedInterface = this.CurNetworkInterface;
+            this.dataGridView1.DataSource = this.packets;
             int result = sniffer.Run();
             if (result != 0)
             {
@@ -196,7 +205,7 @@ namespace CShark
                 this.richTextBox5.Text += "Info: Successfully binded to Network Interface " + this.CurNetworkInterface + " \n";
             }
             // .1 seconds, could be changed and is somewhat randomly picked
-            this.Timer.Interval = (100); 
+            this.Timer.Interval = (100);
             this.Timer.Tick += new EventHandler(Timer_Tick);
             this.Timer.Start();
         }
@@ -210,6 +219,9 @@ namespace CShark
             this.button2.Enabled = false;
             this.comboBox1.Enabled = true;
             this.button3.Enabled = true;
+            if (this.packets.Count > 0) { 
+                this.button4.Enabled = true;
+            }    
             this.button1.Enabled = true;
             this.curPacketCount = 0;
             this.sniffer.CloseSocket();
@@ -538,6 +550,55 @@ namespace CShark
             }
 
             this.timeVisible = !this.timeVisible;
+        }
+
+
+        /// <summary>
+        /// Filter packets after run
+        /// </summary>
+        private void button4_Click(object sender, EventArgs e)
+        {
+            /*
+             * If we are not currently scanning the Network Inteface, filter the captured packets
+             */
+            if (this.button1.Enabled == true)
+            {
+                packetsFiltered.Clear();
+                foreach (Packet packet in this.packets)
+                {
+                    int proInt = 0;
+                    switch (packet.Protocol)
+                    {
+                        case "TCP":
+                            proInt = 6;
+                            break;
+                        case "tcp":
+                            proInt = 6;
+                            break;
+                        case "UDP":
+                            proInt = 17;
+                            break;
+                        case "udp":
+                            proInt = 17;
+                            break;
+                        case "IGMP":
+                            proInt = 2;
+                            break;
+                        case "igmp":
+                            proInt = 2;
+                            break;
+                        default:
+                            Int32.TryParse(packet.Protocol, out proInt);
+                            break;
+                    }
+                    if (this.filter.ContainedInFilter(packet.SrcIpAddress, packet.DstIpAddress, proInt))
+                    {
+                        this.packetsFiltered.Add(packet);
+                    }
+                }
+                this.dataGridView1.DataSource = this.packetsFiltered;
+                return;
+            }
         }
     }
 }
