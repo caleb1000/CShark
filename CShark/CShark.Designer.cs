@@ -58,7 +58,6 @@
             checkBox8 = new CheckBox();
             checkBox9 = new CheckBox();
             checkBox10 = new CheckBox();
-            button4 = new Button();
             richTextBox6 = new RichTextBox();
             label9 = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
@@ -407,18 +406,6 @@
             checkBox10.UseVisualStyleBackColor = false;
             checkBox10.CheckedChanged += checkBox10_CheckedChanged;
             // 
-            // button4
-            // 
-            button4.BackgroundImage = (Image)resources.GetObject("button4.BackgroundImage");
-            button4.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button4.Location = new Point(1473, 145);
-            button4.Name = "button4";
-            button4.Size = new Size(217, 47);
-            button4.TabIndex = 36;
-            button4.Text = "Filter Captured Packets";
-            button4.UseVisualStyleBackColor = true;
-            button4.Click += button4_Click;
-            // 
             // richTextBox6
             // 
             richTextBox6.BackColor = Color.AliceBlue;
@@ -436,7 +423,6 @@
             label9.Size = new Size(82, 15);
             label9.TabIndex = 38;
             label9.Text = "Current Filter";
-            label9.Click += label9_Click;
             // 
             // CShark
             // 
@@ -446,7 +432,6 @@
             ClientSize = new Size(1904, 1041);
             Controls.Add(label9);
             Controls.Add(richTextBox6);
-            Controls.Add(button4);
             Controls.Add(checkBox10);
             Controls.Add(checkBox9);
             Controls.Add(checkBox8);
@@ -518,7 +503,6 @@
         private CheckBox checkBox8;
         private CheckBox checkBox9;
         private CheckBox checkBox10;
-        private Button button4;
         private RichTextBox richTextBox6;
         private Label label9;
     }
