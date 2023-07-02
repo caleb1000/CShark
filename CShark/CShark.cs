@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using System.IO.Packaging;
+using PagedList;
 using System.Net;
 using System.Reflection;
 
@@ -23,11 +23,6 @@ namespace CShark
         System.Windows.Forms.Timer Timer = new();
 
         /// <summary>
-        /// Binding list used to hold packets read from capture
-        /// </summary>
-        BindingList<Packet> packets = new();
-
-        /// <summary>
         /// After a run this list is used to hold the filtered packets
         /// </summary>
         BindingList<Packet> packetsFiltered = new();
@@ -42,15 +37,10 @@ namespace CShark
         /// </summary>
         List<string> NetworkInterfaces = new List<string>();
 
-        /// <summary>
-        /// Current number of packts captured on given run
-        /// </summary>
-        int curPacketCount = 0;
-
         /*
          * Checkbox Bools
          */
-        bool autoSize = true;
+        bool autoScroll = true;
         bool colorRows = true;
         bool transportVisible = true;
         bool ipVisible = true;
@@ -59,6 +49,106 @@ namespace CShark
         bool timeVisible = true;
         bool srcVisible = true;
         bool dstVisible = true;
+
+        /// <summary>
+        /// Current page number in packet list
+        /// </summary>
+        int pageNumber = 1;
+
+        /// <summary>
+        /// Page Size
+        /// </summary>
+        int pageSize = 100;
+
+        bool scrollSubscribed = false;
+
+        private void DataGridView_Scroll(object sender, ScrollEventArgs e)
+        {
+            // Check if the user is scrolling vertically and nearing the end/start
+            if (e.ScrollOrientation == ScrollOrientation.VerticalScroll )
+            {
+                
+                // Check if the last displayed row is near the start
+                if (pageNumber > 1 && e.NewValue < 1 && e.NewValue < e.OldValue)
+                {
+                    pageNumber--;
+                    dataGridView1.DataSource = null;
+                    var pagedList = this.sniffer.Packets.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+                    var listBinding = new BindingList<Packet>(pagedList.ToList());
+                    Packet p = new();
+                    p.SrcIpAddress = "* * * * * * * * * * * * * * * *";
+                    p.DstIpAddress = "* * * * * * * * * * * * * * * *";
+                    p.TransportHeader = "* * * * * * * * * * * * * * * *";
+                    p.Ascii = "* * * * * * * * * * * * * * * *";
+                    p.IpHeader = "* * * * KEEP SCROLLING TO LOADING MORE PACKETS * * * * * * * * * * * *";
+                    p.Protocol = "* * * * * * * * * * * * * * * *";
+                    listBinding.Add(p);
+                    listBinding.Add(p);
+                    listBinding.Add(p);
+                    foreach (Packet packet in pagedList.ToList())
+                    {
+                        listBinding.Add(packet);
+                    }
+                    listBinding.Add(p);
+                    listBinding.Add(p);
+                    listBinding.Add(p);
+
+
+                    dataGridView1.DataSource = listBinding;
+                    dataGridView1.FirstDisplayedScrollingRowIndex = 0;
+                    dataGridView1.FirstDisplayedScrollingRowIndex = 70;
+
+                }
+                // Check if the last displayed row is near the end
+                else if (e.NewValue > 70 && pageNumber * pageSize < this.sniffer.Packets.Count)
+                {
+                    pageNumber++;
+                    dataGridView1.DataSource = null;
+                    var pagedList = this.sniffer.Packets.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+                    BindingList<Packet> listBinding = new();
+                    //TO:DO - this is a weird solution to allow scrolling, find a better way
+                    Packet p = new();
+                    p.SrcIpAddress = "* * * * * * * * * * * * * * * *";
+                    p.DstIpAddress = "* * * * * * * * * * * * * * * *";
+                    p.TransportHeader = "* * * * * * * * * * * * * * * *";
+                    p.Ascii = "* * * * * * * * * * * * * * * *";
+                    p.IpHeader = "* * * * KEEP SCROLLING TO LOADING MORE PACKETS * * * * * * * * * * * *";
+                    p.Protocol = "* * * * * * * * * * * * * * * *";
+                    listBinding.Add(p);
+                    listBinding.Add(p);
+                    listBinding.Add(p);
+                    int packetCount = 0;
+                    foreach (Packet packet in pagedList.ToList())
+                    {
+                        packetCount++;
+                        listBinding.Add(packet);
+                    }
+                    for (int x = 0; x < this.pageSize - packetCount; x++)
+                    {
+                        //if we attempt to scroll to fast we need to fill page with empty values so we don't lose the scroll bar
+                        Packet empty = new();
+                        listBinding.Add(empty);
+
+                    }
+                    if (packetCount == this.pageSize)
+                    {
+                        listBinding.Add(p);
+                        listBinding.Add(p);
+                        listBinding.Add(p);
+                    }
+                    dataGridView1.DataSource = listBinding;
+                    dataGridView1.FirstDisplayedScrollingRowIndex = 1;
+
+                }
+                this.dataGridView1.Columns["Time"].Visible = timeVisible;
+                this.dataGridView1.Columns["SrcIpAddress"].Visible = srcVisible;
+                this.dataGridView1.Columns["DstIpAddress"].Visible = dstVisible;
+                this.dataGridView1.Columns["Protocol"].Visible = protocolVisible;
+                this.dataGridView1.Columns["IpHeader"].Visible = ipVisible;
+                this.dataGridView1.Columns["TransportHeader"].Visible = transportVisible;
+                this.dataGridView1.Columns["Ascii"].Visible = asciiVisible;
+            }
+        }
 
 
         public CShark()
@@ -110,16 +200,9 @@ namespace CShark
             this.dataGridView1.CellFormatting += dataGridView1_CellFormatting;
             this.dataGridView1.ScrollBars = ScrollBars.Both;
             this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.DataSource = this.packets;
-            this.dataGridView1.Columns[0].HeaderText = "Index";
-            this.dataGridView1.Columns[1].HeaderText = "Time";
-            this.dataGridView1.Columns[2].HeaderText = "Source IP Address";
-            this.dataGridView1.Columns[3].HeaderText = "Destination IP Address";
-            this.dataGridView1.Columns[4].HeaderText = "Protocol";
-            this.dataGridView1.Columns[5].HeaderText = "IP Header";
-            this.dataGridView1.Columns[6].HeaderText = "Transport Header";
             this.dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
         }
+
 
         /// <summary>
         /// Paint background as linear gradient
@@ -127,7 +210,6 @@ namespace CShark
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-
             // Create a linear gradient brush
             using (var brush = new System.Drawing.Drawing2D.LinearGradientBrush(
                 ClientRectangle, Color.AliceBlue, Color.DeepSkyBlue,
@@ -144,34 +226,65 @@ namespace CShark
         /// </summary>
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (this.sniffer.Packets.Count > 0)
+            //If autoScroll is enabled re-render the page to the current last page
+            if (autoScroll)
             {
-                int scrollPosition = this.dataGridView1.FirstDisplayedScrollingRowIndex;
-                int preSize = this.packets.Count;
-                var orderedPackets = this.sniffer.Packets.OrderBy(p => p.index);
-                int postSize = orderedPackets.Count();
-
-                for (int i = preSize; i < postSize; i++)
+                int horzScroll = dataGridView1.HorizontalScrollingOffset;
+                int lastPage = (int)Math.Ceiling((decimal)this.sniffer.Packets.Count() / (decimal)pageSize);
+                if (lastPage == 0)
                 {
-                    this.curPacketCount++;
-                    this.packets.Add(orderedPackets.ElementAt(i));
+                    lastPage = 1;
                 }
-                this.richTextBox1.Text = "Packets Captured: " + this.curPacketCount.ToString();
-
-
-                if (scrollPosition + this.dataGridView1.DisplayedRowCount(false) - 1 == preSize)
+                pageNumber = lastPage;
+                var pagedList = this.sniffer.Packets.OrderBy(b => b.index).ToPagedList(lastPage, pageSize);
+                var listBinding = new BindingList<Packet>(pagedList.ToList());
+                int preBufferCount = listBinding.Count;
+                for (int x = preBufferCount; x < 30; x++)
                 {
-                    this.dataGridView1.FirstDisplayedScrollingRowIndex = this.dataGridView1.Rows.Count - 1; ;
+                    //if we attempt to scroll to fast we need to fill page with empty values so we don't lose the scroll bar
+                    Packet empty = new();
+                    listBinding.Add(empty);
                 }
-                else
-                {
-                    this.dataGridView1.FirstDisplayedScrollingRowIndex = scrollPosition;
-                }
+                this.dataGridView1.DataSource = listBinding;
+
+                /*
+                 * Make sure to restore settings after re-rendering page
+                 */
+                this.dataGridView1.HorizontalScrollingOffset = horzScroll;
+                this.dataGridView1.FirstDisplayedScrollingRowIndex = this.dataGridView1.RowCount -1;
+                this.dataGridView1.Columns["Time"].Visible = timeVisible;
+                this.dataGridView1.Columns["SrcIpAddress"].Visible = srcVisible;
+                this.dataGridView1.Columns["DstIpAddress"].Visible = dstVisible;
+                this.dataGridView1.Columns["Protocol"].Visible = protocolVisible;
+                this.dataGridView1.Columns["IpHeader"].Visible = ipVisible;
+                this.dataGridView1.Columns["TransportHeader"].Visible = transportVisible;
+                this.dataGridView1.Columns["Ascii"].Visible = asciiVisible;
             }
-            else
+            //re-render dataGridView if we are not displaying enough entries to display a page of packets
+            else if (this.dataGridView1.RowCount - 1 < pageSize)
             {
-                this.dataGridView1.FirstDisplayedScrollingRowIndex = 0;
+                int vertScroll = dataGridView1.FirstDisplayedScrollingRowIndex;
+                int horzScroll = dataGridView1.HorizontalScrollingOffset;
+                this.dataGridView1.DataSource = null;
+                var pagedList = this.sniffer.Packets.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+                var listBinding = new BindingList<Packet>(pagedList.ToList());
+                this.dataGridView1.DataSource = listBinding;
+
+                /*
+                 * Make sure to restore settings after re-rendering page
+                 */
+                this.dataGridView1.FirstDisplayedScrollingRowIndex = vertScroll;
+                this.dataGridView1.HorizontalScrollingOffset = horzScroll;
+                this.dataGridView1.Columns["Time"].Visible = timeVisible;
+                this.dataGridView1.Columns["SrcIpAddress"].Visible = srcVisible;
+                this.dataGridView1.Columns["DstIpAddress"].Visible = dstVisible;
+                this.dataGridView1.Columns["Protocol"].Visible = protocolVisible;
+                this.dataGridView1.Columns["IpHeader"].Visible = ipVisible;
+                this.dataGridView1.Columns["TransportHeader"].Visible = transportVisible;
+                this.dataGridView1.Columns["Ascii"].Visible = asciiVisible;
             }
+            this.richTextBox1.Text = "Packets Captured: " + this.sniffer.Packets.Count.ToString();
+
         }
 
 
@@ -180,17 +293,23 @@ namespace CShark
         /// </summary>
         private void button1_Click(object sender, EventArgs e)
         {
+            SetFilter();
+            this.pageNumber = 1;
             this.button2.Enabled = true;
             this.comboBox1.Enabled = false;
             this.button3.Enabled = false;
             this.button1.Enabled = false;
-            this.packets.Clear();
+            if (scrollSubscribed == false)
+            {
+                this.dataGridView1.Scroll += DataGridView_Scroll;
+                scrollSubscribed = true;
+            }
             this.dataGridView1.Refresh();
             this.richTextBox1.Text = "Packets Captured: 0";
             this.richTextBox7.Text = string.Empty;
+            this.sniffer = new Sniffer();
             this.sniffer.SetFilter(this.filter);
             this.sniffer.SelectedInterface = this.CurNetworkInterface;
-            this.dataGridView1.DataSource = this.packets;
             int result = sniffer.Run();
             if (result != 0)
             {
@@ -217,8 +336,8 @@ namespace CShark
             this.comboBox1.Enabled = true;
             this.button3.Enabled = true;
             this.button1.Enabled = true;
-            this.curPacketCount = 0;
             this.sniffer.CloseSocket();
+            
 
             this.richTextBox7.Text += "Source IP Addresses Observed:\n";
             this.richTextBox7.Text += "------------------------------------------\n";
@@ -238,17 +357,29 @@ namespace CShark
             {
                 this.richTextBox7.Text += pro.ToString() + "\n";
             }
-            this.sniffer = new();
+
+            //Render the packet one more time to ensure we do not lose the scroll bar
+            var pagedList = this.sniffer.Packets.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+            var listBinding = new BindingList<Packet>(pagedList.ToList());
+            for (int x = pagedList.Count; x < 35; x++)
+            {
+                //if we attempt to scroll to fast we need to fill page with empty values so we don't lose the scroll bar
+                Packet empty = new();
+                listBinding.Add(empty);
+            }
+            this.dataGridView1.DataSource = listBinding;
+            this.richTextBox1.Text = "Packets Captured: " + this.sniffer.Packets.Count.ToString();
+            this.dataGridView1.FirstDisplayedScrollingRowIndex = 1;
             this.Timer.Stop();
 
         }
+
 
         /// <summary>
         /// Color Cells in dataGridView1 based on protocol
         /// </summary>
         private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-
             if (e.RowIndex >= 0 && this.dataGridView1.Rows[e.RowIndex].DataBoundItem != null)
             {
                 Packet packet = this.dataGridView1.Rows[e.RowIndex].DataBoundItem as Packet;
@@ -265,18 +396,23 @@ namespace CShark
                 {
                     this.dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Yellow;
                 }
+                else if (packet != null && packet.Protocol == "* * * * * * * * * * * * * * * *")
+                {
+                    //This is for rendering buffer packets
+                    this.dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Orange;
+                }
                 else
                 {
-                    this.dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Orange;
+                    this.dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.White;
                 }
             }
 
         }
 
         /// <summary>
-        /// Parse filter settings and apply new filter
+        /// Set current filter based on filters set in textboxes
         /// </summary>
-        private void button3_Click(object sender, EventArgs e)
+        private void SetFilter()
         {
             this.filter = new();
             this.richTextBox6.Text = "";
@@ -368,11 +504,28 @@ namespace CShark
                     }
                 }
             }
+        }
 
-            if (this.button1.Enabled == true && packets.Count > 0)
+
+        /// <summary>
+        /// Parse filter settings and apply new filter
+        /// </summary>
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (scrollSubscribed == true)
+            {
+                this.dataGridView1.Scroll -= DataGridView_Scroll;
+                scrollSubscribed = false;
+            }
+            
+            SetFilter();
+            this.dataGridView1.DataSource = null;
+            if (this.button1.Enabled == true)
             {
                 packetsFiltered.Clear();
-                foreach (Packet packet in this.packets)
+                var ordredList = this.sniffer.Packets.OrderBy(p => p.index).ToList();
+                var listBinding = new BindingList<Packet>(ordredList);
+                foreach (Packet packet in listBinding)
                 {
                     int proInt = 0;
                     switch (packet.Protocol)
@@ -399,11 +552,13 @@ namespace CShark
                             Int32.TryParse(packet.Protocol, out proInt);
                             break;
                     }
+                    
                     if (this.filter.ContainedInFilter(packet.SrcIpAddress, packet.DstIpAddress, proInt))
                     {
                         this.packetsFiltered.Add(packet);
                     }
                 }
+                //to:do - the bottel neck here is not having paging, add paging to filtered list
                 this.dataGridView1.DataSource = this.packetsFiltered;
 
             }
@@ -430,16 +585,7 @@ namespace CShark
         /// </summary>
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            this.autoSize = !this.autoSize;
-            if (this.autoSize)
-            {
-                this.dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            }
-            else
-            {
-                this.dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-            }
-
+            this.autoScroll = !this.autoScroll;
         }
 
 

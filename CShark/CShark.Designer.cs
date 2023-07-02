@@ -72,7 +72,7 @@
             dataGridView1.Name = "dataGridView1";
             dataGridView1.ReadOnly = true;
             dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.Size = new Size(1856, 791);
+            dataGridView1.Size = new Size(1856, 816);
             dataGridView1.TabIndex = 0;
             // 
             // button1
@@ -233,9 +233,9 @@
             checkBox1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             checkBox1.Location = new Point(12, 78);
             checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(109, 19);
+            checkBox1.Size = new Size(84, 19);
             checkBox1.TabIndex = 22;
-            checkBox1.Text = "Auto Size Rows";
+            checkBox1.Text = "Auto Scroll";
             checkBox1.UseVisualStyleBackColor = false;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
             // 
