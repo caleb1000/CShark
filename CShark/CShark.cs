@@ -304,6 +304,7 @@ namespace CShark
                 this.dataGridView1.Scroll += DataGridView_Scroll;
                 scrollSubscribed = true;
             }
+
             this.dataGridView1.Refresh();
             this.richTextBox1.Text = "Packets Captured: 0";
             this.richTextBox7.Text = string.Empty;
@@ -320,6 +321,12 @@ namespace CShark
             {
                 this.richTextBox5.Text += "Info: Successfully binded to Network Interface " + this.CurNetworkInterface + " \n";
             }
+
+            //While listBinding will not have any entries, this refreshes the dataGridView1 in the case autoScroll is turned off
+            var pagedList = this.sniffer.Packets.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+            var listBinding = new BindingList<Packet>(pagedList.ToList());
+            this.dataGridView1.DataSource = listBinding;
+
             // .1 seconds, could be changed and is somewhat randomly picked
             this.Timer.Interval = (100);
             this.Timer.Tick += new EventHandler(Timer_Tick);
