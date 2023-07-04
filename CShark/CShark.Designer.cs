@@ -182,6 +182,7 @@
             pictureBox1.Size = new Size(87, 84);
             pictureBox1.TabIndex = 12;
             pictureBox1.TabStop = false;
+            pictureBox1.Click += pictureBox1_Click;
             // 
             // label5
             // 
