@@ -65,6 +65,43 @@ namespace CShark
 
         bool scrollSubscribed = false;
 
+        //Add buffer packets to binding list so we can scroll to the bottom and see the last entries
+        private void AddLoadingBuffer(ref BindingList<Packet> listBinding, IPagedList<Packet> pagedList)
+        {
+            Packet p = new();
+            p.SrcIpAddress = "* * * * * * * * * * * * * * * *";
+            p.DstIpAddress = "* * * * * * * * * * * * * * * *";
+            p.TransportHeader = "* * * * * * * * * * * * * * * *";
+            p.Ascii = "* * * * * * * * * * * * * * * *";
+            p.IpHeader = "* * * * KEEP SCROLLING TO LOADING MORE PACKETS * * * * * * * * * * * *";
+            p.Protocol = "* * * * * * * * * * * * * * * *";
+            if (pageNumber != 1)
+            {
+                listBinding.Add(p);
+                listBinding.Add(p);
+                listBinding.Add(p);
+            }
+            int packetCount = 0;
+            foreach (Packet packet in pagedList.ToList())
+            {
+                packetCount++;
+                listBinding.Add(packet);
+            }
+            for (int x = 0; x < this.pageSize - packetCount; x++)
+            {
+                //if we attempt to scroll to fast we need to fill page with empty values so we don't lose the scroll bar
+                Packet empty = new();
+                listBinding.Add(empty);
+            }
+            if (packetCount == this.pageSize)
+            {
+                listBinding.Add(p);
+                listBinding.Add(p);
+                listBinding.Add(p);
+            }
+            return;
+        }
+
         private void DataGridView_Scroll(object sender, ScrollEventArgs e)
         {
             // Check if the user is scrolling vertically and nearing the end/start
@@ -86,26 +123,8 @@ namespace CShark
                         pagedList = this.sniffer.Packets.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
                     }
 
-                    var listBinding = new BindingList<Packet>(pagedList.ToList());
-                    Packet p = new();
-                    p.SrcIpAddress = "* * * * * * * * * * * * * * * *";
-                    p.DstIpAddress = "* * * * * * * * * * * * * * * *";
-                    p.TransportHeader = "* * * * * * * * * * * * * * * *";
-                    p.Ascii = "* * * * * * * * * * * * * * * *";
-                    p.IpHeader = "* * * * KEEP SCROLLING TO LOADING MORE PACKETS * * * * * * * * * * * *";
-                    p.Protocol = "* * * * * * * * * * * * * * * *";
-                    listBinding.Add(p);
-                    listBinding.Add(p);
-                    listBinding.Add(p);
-                    foreach (Packet packet in pagedList.ToList())
-                    {
-                        listBinding.Add(packet);
-                    }
-                    listBinding.Add(p);
-                    listBinding.Add(p);
-                    listBinding.Add(p);
-
-
+                    BindingList<Packet> listBinding = new();
+                    AddLoadingBuffer(ref listBinding, pagedList);
                     dataGridView1.DataSource = listBinding;
                     dataGridView1.FirstDisplayedScrollingRowIndex = 0;
                     dataGridView1.FirstDisplayedScrollingRowIndex = 70;
@@ -132,35 +151,7 @@ namespace CShark
                     }
 
                     BindingList<Packet> listBinding = new();
-                    //TO:DO - this is a weird solution to allow scrolling, find a better way
-                    Packet p = new();
-                    p.SrcIpAddress = "* * * * * * * * * * * * * * * *";
-                    p.DstIpAddress = "* * * * * * * * * * * * * * * *";
-                    p.TransportHeader = "* * * * * * * * * * * * * * * *";
-                    p.Ascii = "* * * * * * * * * * * * * * * *";
-                    p.IpHeader = "* * * * KEEP SCROLLING TO LOADING MORE PACKETS * * * * * * * * * * * *";
-                    p.Protocol = "* * * * * * * * * * * * * * * *";
-                    listBinding.Add(p);
-                    listBinding.Add(p);
-                    listBinding.Add(p);
-                    int packetCount = 0;
-                    foreach (Packet packet in pagedList.ToList())
-                    {
-                        packetCount++;
-                        listBinding.Add(packet);
-                    }
-                    for (int x = 0; x < this.pageSize - packetCount; x++)
-                    {
-                        //if we attempt to scroll to fast we need to fill page with empty values so we don't lose the scroll bar
-                        Packet empty = new();
-                        listBinding.Add(empty);
-                    }
-                    if (packetCount == this.pageSize)
-                    {
-                        listBinding.Add(p);
-                        listBinding.Add(p);
-                        listBinding.Add(p);
-                    }
+                    AddLoadingBuffer(ref listBinding, pagedList);
                     dataGridView1.DataSource = listBinding;
                     dataGridView1.FirstDisplayedScrollingRowIndex = 1;
 
@@ -599,31 +590,7 @@ namespace CShark
                 }
                 var pagedList = this.packetsFiltered.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
                 listBinding = new();
-                Packet p = new();
-                p.SrcIpAddress = "* * * * * * * * * * * * * * * *";
-                p.DstIpAddress = "* * * * * * * * * * * * * * * *";
-                p.TransportHeader = "* * * * * * * * * * * * * * * *";
-                p.Ascii = "* * * * * * * * * * * * * * * *";
-                p.IpHeader = "* * * * KEEP SCROLLING TO LOADING MORE PACKETS * * * * * * * * * * * *";
-                p.Protocol = "* * * * * * * * * * * * * * * *";
-                listBinding.Add(p);
-                listBinding.Add(p);
-                listBinding.Add(p);
-                int packetCount = 0;
-                foreach (Packet packet in pagedList.ToList())
-                {
-                    packetCount++;
-                    listBinding.Add(packet);
-                }
-                for (int x = 0; x < this.pageSize - packetCount; x++)
-                {
-                    //if we attempt to scroll to fast we need to fill page with empty values so we don't lose the scroll bar
-                    Packet empty = new();
-                    listBinding.Add(empty);
-                }
-                listBinding.Add(p);
-                listBinding.Add(p);
-                listBinding.Add(p);
+                AddLoadingBuffer(ref listBinding, pagedList);
 
 
                 this.dataGridView1.DataSource = listBinding;
