@@ -195,6 +195,7 @@
             label5.Size = new Size(176, 42);
             label5.TabIndex = 14;
             label5.Text = "C#Shark";
+            label5.Click += label5_Click;
             // 
             // richTextBox7
             // 
@@ -281,9 +282,10 @@
             // richTextBox5
             // 
             richTextBox5.BackColor = Color.AliceBlue;
-            richTextBox5.Location = new Point(300, 22);
+            richTextBox5.Location = new Point(290, 22);
             richTextBox5.Name = "richTextBox5";
-            richTextBox5.Size = new Size(207, 66);
+            richTextBox5.ReadOnly = true;
+            richTextBox5.Size = new Size(217, 66);
             richTextBox5.TabIndex = 26;
             richTextBox5.Text = "";
             // 
@@ -410,9 +412,10 @@
             // richTextBox6
             // 
             richTextBox6.BackColor = Color.AliceBlue;
-            richTextBox6.Location = new Point(300, 108);
+            richTextBox6.Location = new Point(290, 108);
             richTextBox6.Name = "richTextBox6";
-            richTextBox6.Size = new Size(207, 73);
+            richTextBox6.ReadOnly = true;
+            richTextBox6.Size = new Size(217, 73);
             richTextBox6.TabIndex = 37;
             richTextBox6.Text = "";
             // 

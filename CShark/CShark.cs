@@ -199,6 +199,7 @@ namespace CShark
             this.button2.Enabled = false;
         }
 
+
         /// <summary>
         /// Init settings for dataGridView1
         /// </summary>
@@ -216,6 +217,8 @@ namespace CShark
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridView1.Scroll += DataGridView_Scroll;
+            BindingList<Packet> dummy = new();
+            this.dataGridView1.DataSource = dummy;
         }
 
 
@@ -431,6 +434,10 @@ namespace CShark
                     this.filter.SourceIPAddresses.Add(src);
                 }
             }
+            if (this.filter.SourceIPAddresses.Count == 0)
+            {
+                this.richTextBox6.Text += "    Source IP: Any\n";
+            }
 
             /*
              * Parse Destination IP Address Filters
@@ -446,6 +453,10 @@ namespace CShark
                     this.richTextBox6.Text += "    Destination IP: " + dst + "\n";
                     this.filter.DestinationIPAddresses.Add(dst);
                 }
+            }
+            if (this.filter.DestinationIPAddresses.Count == 0)
+            {
+                this.richTextBox6.Text += "    Destination IP: Any\n";
             }
 
             /*
@@ -502,6 +513,10 @@ namespace CShark
                             break;
                     }
                 }
+            }
+            if (this.filter.Protocols.Count == 0)
+            {
+                this.richTextBox6.Text += "    Protocol: Any\n";
             }
         }
 
@@ -564,7 +579,7 @@ namespace CShark
 
 
         /// <summary>
-        /// Sets dataGridView1's column visibility to current bool state
+        /// Sets dataGridView1's column visibility to current bool state and change column names
         /// </summary>
         private void SetDataGridViewVisible()
         {
@@ -575,6 +590,13 @@ namespace CShark
             this.dataGridView1.Columns["IpHeader"].Visible = ipVisible;
             this.dataGridView1.Columns["TransportHeader"].Visible = transportVisible;
             this.dataGridView1.Columns["Ascii"].Visible = asciiVisible;
+            this.dataGridView1.Columns["Time"].HeaderText = "Time";
+            this.dataGridView1.Columns["SrcIpAddress"].HeaderText = "Source IP Address";
+            this.dataGridView1.Columns["DstIpAddress"].HeaderText = "Destination IP Address";
+            this.dataGridView1.Columns["Protocol"].HeaderText = "Protocol";
+            this.dataGridView1.Columns["IpHeader"].HeaderText = "IP Layer";
+            this.dataGridView1.Columns["TransportHeader"].HeaderText = "Transport Layer";
+            this.dataGridView1.Columns["Ascii"].HeaderText = "Ascii";
         }
 
 
@@ -747,8 +769,18 @@ namespace CShark
 
         /// <summary>
         /// Send user to github of C#Shark
+        /// TO:DO - Replace with a link to the wiki
         /// </summary>
         private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            Process.Start(new ProcessStartInfo("https://github.com/caleb1000/CShark") { UseShellExecute = true });
+        }
+
+
+        /// <summary>
+        /// Send user to github of C#Shark
+        /// </summary>
+        private void label5_Click(object sender, EventArgs e)
         {
             Process.Start(new ProcessStartInfo("https://github.com/caleb1000/CShark") { UseShellExecute = true });
         }

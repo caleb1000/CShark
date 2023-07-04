@@ -186,7 +186,7 @@ class Sniffer
             packet.DstIpAddress = dstString;
             packet.Time = DateTime.Now;
             packet.index = Index;
-            packet.Ascii = HexStringToAscii(transportPacketHex);
+            packet.Ascii = HexStringToAscii(fullPacketHex);
 
             if (filter != null && filter.ContainedInFilter(srcString, dstString, (int)protocol))
             {
