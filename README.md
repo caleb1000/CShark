@@ -16,8 +16,6 @@
 * Save traffic in PCAP format
 * Support packet injection (will need to use 3rd party lib as raw sockets cannot send tcp packets on windows)
 * Add network statistics monitoring
-  
-![image](https://github.com/caleb1000/CShark/assets/30327564/601665d3-2d20-4fb8-8e82-c51e99c0bf7b)
 
   
 
