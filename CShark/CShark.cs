@@ -60,20 +60,32 @@ namespace CShark
         /// </summary>
         int pageSize = 100;
 
+
+        bool dataSourceFilter = false;
+
         bool scrollSubscribed = false;
 
         private void DataGridView_Scroll(object sender, ScrollEventArgs e)
         {
             // Check if the user is scrolling vertically and nearing the end/start
-            if (e.ScrollOrientation == ScrollOrientation.VerticalScroll )
+            if (e.ScrollOrientation == ScrollOrientation.VerticalScroll)
             {
-                
+
                 // Check if the last displayed row is near the start
                 if (pageNumber > 1 && e.NewValue < 1 && e.NewValue < e.OldValue)
                 {
                     pageNumber--;
                     dataGridView1.DataSource = null;
-                    var pagedList = this.sniffer.Packets.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+                    IPagedList<Packet> pagedList;
+                    if (dataSourceFilter)
+                    {
+                        pagedList = this.packetsFiltered.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+                    }
+                    else
+                    {
+                        pagedList = this.sniffer.Packets.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+                    }
+
                     var listBinding = new BindingList<Packet>(pagedList.ToList());
                     Packet p = new();
                     p.SrcIpAddress = "* * * * * * * * * * * * * * * *";
@@ -102,9 +114,23 @@ namespace CShark
                 // Check if the last displayed row is near the end
                 else if (e.NewValue > 70 && pageNumber * pageSize < this.sniffer.Packets.Count)
                 {
+                    if (dataSourceFilter && pageNumber * pageSize > this.packetsFiltered.Count)
+                    {
+                        //if we are in filter mode we need to make the check for that buffer instead
+                        return;
+                    }
                     pageNumber++;
                     dataGridView1.DataSource = null;
-                    var pagedList = this.sniffer.Packets.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+                    IPagedList<Packet> pagedList;
+                    if (dataSourceFilter)
+                    {
+                        pagedList = this.packetsFiltered.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+                    }
+                    else
+                    {
+                        pagedList = this.sniffer.Packets.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+                    }
+
                     BindingList<Packet> listBinding = new();
                     //TO:DO - this is a weird solution to allow scrolling, find a better way
                     Packet p = new();
@@ -128,7 +154,6 @@ namespace CShark
                         //if we attempt to scroll to fast we need to fill page with empty values so we don't lose the scroll bar
                         Packet empty = new();
                         listBinding.Add(empty);
-
                     }
                     if (packetCount == this.pageSize)
                     {
@@ -201,6 +226,7 @@ namespace CShark
             this.dataGridView1.ScrollBars = ScrollBars.Both;
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridView1.Scroll += DataGridView_Scroll;
         }
 
 
@@ -251,7 +277,7 @@ namespace CShark
                  * Make sure to restore settings after re-rendering page
                  */
                 this.dataGridView1.HorizontalScrollingOffset = horzScroll;
-                this.dataGridView1.FirstDisplayedScrollingRowIndex = this.dataGridView1.RowCount -1;
+                this.dataGridView1.FirstDisplayedScrollingRowIndex = this.dataGridView1.RowCount - 1;
                 this.dataGridView1.Columns["Time"].Visible = timeVisible;
                 this.dataGridView1.Columns["SrcIpAddress"].Visible = srcVisible;
                 this.dataGridView1.Columns["DstIpAddress"].Visible = dstVisible;
@@ -294,6 +320,7 @@ namespace CShark
         private void button1_Click(object sender, EventArgs e)
         {
             SetFilter();
+            this.dataSourceFilter = false;
             this.pageNumber = 1;
             this.button2.Enabled = true;
             this.comboBox1.Enabled = false;
@@ -301,7 +328,7 @@ namespace CShark
             this.button1.Enabled = false;
             if (scrollSubscribed == false)
             {
-                this.dataGridView1.Scroll += DataGridView_Scroll;
+                //     this.dataGridView1.Scroll += DataGridView_Scroll;
                 scrollSubscribed = true;
             }
 
@@ -344,7 +371,7 @@ namespace CShark
             this.button3.Enabled = true;
             this.button1.Enabled = true;
             this.sniffer.CloseSocket();
-            
+
 
             this.richTextBox7.Text += "Source IP Addresses Observed:\n";
             this.richTextBox7.Text += "------------------------------------------\n";
@@ -519,18 +546,23 @@ namespace CShark
         /// </summary>
         private void button3_Click(object sender, EventArgs e)
         {
+            dataSourceFilter = true;
+            pageNumber = 1;
+
             if (scrollSubscribed == true)
             {
-                this.dataGridView1.Scroll -= DataGridView_Scroll;
+                //   this.dataGridView1.Scroll -= DataGridView_Scroll;
                 scrollSubscribed = false;
             }
-            
+
             SetFilter();
             this.dataGridView1.DataSource = null;
             if (this.button1.Enabled == true)
             {
                 packetsFiltered.Clear();
                 var ordredList = this.sniffer.Packets.OrderBy(p => p.index).ToList();
+
+                //to:do fix this so we stop assigning things we don't need
                 var listBinding = new BindingList<Packet>(ordredList);
                 foreach (Packet packet in listBinding)
                 {
@@ -559,14 +591,51 @@ namespace CShark
                             Int32.TryParse(packet.Protocol, out proInt);
                             break;
                     }
-                    
+
                     if (this.filter.ContainedInFilter(packet.SrcIpAddress, packet.DstIpAddress, proInt))
                     {
                         this.packetsFiltered.Add(packet);
                     }
                 }
-                //to:do - the bottel neck here is not having paging, add paging to filtered list
-                this.dataGridView1.DataSource = this.packetsFiltered;
+                var pagedList = this.packetsFiltered.OrderBy(b => b.index).ToPagedList(pageNumber, pageSize);
+                listBinding = new();
+                Packet p = new();
+                p.SrcIpAddress = "* * * * * * * * * * * * * * * *";
+                p.DstIpAddress = "* * * * * * * * * * * * * * * *";
+                p.TransportHeader = "* * * * * * * * * * * * * * * *";
+                p.Ascii = "* * * * * * * * * * * * * * * *";
+                p.IpHeader = "* * * * KEEP SCROLLING TO LOADING MORE PACKETS * * * * * * * * * * * *";
+                p.Protocol = "* * * * * * * * * * * * * * * *";
+                listBinding.Add(p);
+                listBinding.Add(p);
+                listBinding.Add(p);
+                int packetCount = 0;
+                foreach (Packet packet in pagedList.ToList())
+                {
+                    packetCount++;
+                    listBinding.Add(packet);
+                }
+                for (int x = 0; x < this.pageSize - packetCount; x++)
+                {
+                    //if we attempt to scroll to fast we need to fill page with empty values so we don't lose the scroll bar
+                    Packet empty = new();
+                    listBinding.Add(empty);
+                }
+                listBinding.Add(p);
+                listBinding.Add(p);
+                listBinding.Add(p);
+
+
+                this.dataGridView1.DataSource = listBinding;
+                //TO:DO - Clean this up and make it a function to call
+                this.dataGridView1.Columns["Time"].Visible = timeVisible;
+                this.dataGridView1.Columns["SrcIpAddress"].Visible = srcVisible;
+                this.dataGridView1.Columns["DstIpAddress"].Visible = dstVisible;
+                this.dataGridView1.Columns["Protocol"].Visible = protocolVisible;
+                this.dataGridView1.Columns["IpHeader"].Visible = ipVisible;
+                this.dataGridView1.Columns["TransportHeader"].Visible = transportVisible;
+                this.dataGridView1.Columns["Ascii"].Visible = asciiVisible;
+
 
             }
 
