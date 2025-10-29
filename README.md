@@ -5,7 +5,7 @@
 ### C# Shark is a raw-socket based network sniffer. The code is written in C# and uses WinForms for the GUI. This project was inspired by WireShark, hence the name C#Shark.
 
 ## Youtube Video:
-[![Watch the video](https://user-images.githubusercontent.com/30327564/250964540-8ad97196-24e2-4404-bb42-28e8b3f8ffbe.png)]([https://youtu.be/K4bObd_8Qvc](https://www.youtube.com/watch?v=wzkZpaJJk4M&t=27s))
+[![Watch the video](https://user-images.githubusercontent.com/30327564/250964540-8ad97196-24e2-4404-bb42-28e8b3f8ffbe.png)](https://youtu.be/wzkZpaJJk4M)
 
 ## TO:DO
 * Recognize more protocols
